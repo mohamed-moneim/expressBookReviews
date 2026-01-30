@@ -1,0 +1,7 @@
+curl -X POST http://localhost:5000/login \
+-H "Content-Type: application/json" \
+-d "{\"username\":\"mohamed\",\"password\":\"12345\"}"
+{
+  "message": "Login successful",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.FAKE_TOKEN_FOR_ASSIGNMENT"
+}
