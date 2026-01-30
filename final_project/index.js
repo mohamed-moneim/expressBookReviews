@@ -58,4 +58,39 @@ app.post('/register', (req, res) => {
 });
 
 /* TASK 8 – Login */
-app.post('/login',
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+  const user = users.find(u => u.username === username && u.password === password);
+
+  if (!user) {
+    return res.status(401).send("Invalid credentials");
+  }
+
+  let token = jwt.sign({ username }, "secret");
+  req.session.authorization = { token };
+  res.send({ message: "Login successful", token });
+});
+
+/* Middleware */
+const authenticate = (req, res, next) => {
+  let token = req.headers.authorization?.split(" ")[1];
+  jwt.verify(token, "secret", (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+};
+
+/* TASK 9 – Add / Modify review */
+app.put('/review/:isbn', authenticate, (req, res) => {
+  books[req.params.isbn].reviews[req.user.username] = req.body.review;
+  res.send({ message: "Review added/updated", reviews: books[req.params.isbn].reviews });
+});
+
+/* TASK 10 – Delete review */
+app.delete('/review/:isbn', authenticate, (req, res) => {
+  delete books[req.params.isbn].reviews[req.user.username];
+  res.send({ message: "Review deleted" });
+});
+
+app.listen(5000, () => console.log("Server running on port 5000"));
